@@ -46,13 +46,15 @@ $(OBJFILES):
 	@$(ECHO) Compiling $(notdir $<)
 	@$(ECHO) '$(OBJ_CMD)' > $@.cmdline
 	@$(OBJ_CMD) 2> $@.log
+	@[ -s $@.log ] || $(RM) $@.log
 
-TARGET_CMD = $(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS)
+TARGET_CMD = $(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 $(addprefix $(BUILDDIR)/,$(TARGET)):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Linking $(notdir $@)
 	@$(ECHO) '$(TARGET_CMD)' > $@.cmdline
 	@$(TARGET_CMD) 2> $@.log
+	@[ -s $@.log ] || $(RM) $@.log
 
 clean:
 	@$(RM) $(BUILDDIR) $(TARGET)
@@ -69,6 +71,7 @@ $(TOOLS):
 	@$(ECHO) Building tool $(notdir $@)
 	@$(ECHO) '$(TOOLS_CMD)' > $@.cmdline
 	@$(TOOLS_CMD) 2> $@.log
+	@[ -s $@.log ] || $(RM) $@.log
 
 define gensrc
   $1_CMD = $2 $3 $4 $1 < $$< > $$@
@@ -76,7 +79,8 @@ define gensrc
 	@$(MKDIR) $$(dir $$@)
 	@$(ECHO) Generating $$(notdir $$@)
 	@$(ECHO) '$$($1_CMD)' > $$@.cmdline
-	@$$($1_CMD)
+	@$$($1_CMD)  2> $$@.log
+	@[ -s $$@.log ] || $(RM) $$@.log
 endef
 
 $(eval $(call gensrc,pc1,$(TABLEGEN),64,56))
@@ -89,6 +93,7 @@ $(eval $(call gensrc,sboxes, $(SBOXGEN)))
 
 ## Dependencies
 $(addprefix $(BUILDDIR)/,$(TARGET)): $(OBJFILES)
+
 $(TABLEGEN): $(SRC)/tools/tablegen.c
 $(SBOXGEN): $(SRC)/tools/sboxgen.c
 
