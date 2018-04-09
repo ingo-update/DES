@@ -23,7 +23,7 @@ TESTKEY = abcd1234cdef5678
 TOPDIR = $(shell pwd)
 SRC = $(TOPDIR)/src
 BUILDDIR = $(TOPDIR)/build
-OBJDIR = $(BUILDDIR)/obj
+OBJDIR = $(BUILDDIR)/objs
 GENSRC = $(BUILDDIR)/gensrc
 TOOLSDIR = $(BUILDDIR)/tools
 
@@ -37,21 +37,21 @@ OBJFILES = $(sort \
                )
 
 default: $(TARGET)
-$(TARGET): $(BUILDDIR)/$(TARGET)
-	@$(CP) $< $@
+$(TARGET): $(addprefix $(BUILDDIR)/,$(TARGET))
+	@$(CP) $^ $(TOPDIR)
 
 OBJ_CMD = $(CC) -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
 $(OBJFILES):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Compiling $(notdir $<)
-	@$(ECHO) "$(OBJ_CMD)" > $@.cmdline
+	@$(ECHO) '$(OBJ_CMD)' > $@.cmdline
 	@$(OBJ_CMD) 2> $@.log
 
 TARGET_CMD = $(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS)
-$(BUILDDIR)/$(TARGET): $(OBJFILES)
-	@$(ECHO) Linking $(notdir $@)
+$(addprefix $(BUILDDIR)/,$(TARGET)):
 	@$(MKDIR) $(dir $@)
-	@$(ECHO) $(TARGET_CMD) > $@.cmdline
+	@$(ECHO) Linking $(notdir $@)
+	@$(ECHO) '$(TARGET_CMD)' > $@.cmdline
 	@$(TARGET_CMD) 2> $@.log
 
 clean:
@@ -63,14 +63,11 @@ sweep: clean
 test: $(TARGET)
 	./$(TARGET) $(TESTKEY) -i Makefile | ./$(TARGET) $(TESTKEY) -d
 
-debug:
-	@$(ECHO) $(OBJFILES)
-
 TOOLS_CMD = $(LD) $(TOOLS_LDFLAGS) $^ $(TOOLS_LDLIBS) -o $@
 $(TOOLS):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Building tool $(notdir $@)
-	@$(ECHO) "$(TOOLS_CMD)" > $@.cmdline
+	@$(ECHO) '$(TOOLS_CMD)' > $@.cmdline
 	@$(TOOLS_CMD) 2> $@.log
 
 define gensrc
@@ -78,7 +75,7 @@ define gensrc
   $(GENSRC)/$1.c:
 	@$(MKDIR) $$(dir $$@)
 	@$(ECHO) Generating $$(notdir $$@)
-	@$(ECHO) "$$($1_CMD)" > $$@.cmdline
+	@$(ECHO) '$$($1_CMD)' > $$@.cmdline
 	@$$($1_CMD)
 endef
 
@@ -88,9 +85,10 @@ $(eval $(call gensrc,ip,$(TABLEGEN),64,64))
 $(eval $(call gensrc,pi,$(TABLEGEN),64,64))
 $(eval $(call gensrc,e,$(TABLEGEN),32,48))
 $(eval $(call gensrc,p,$(TABLEGEN),32,32))
-$(eval $(call gensrc,sboxes,$(SBOXGEN),,))
+$(eval $(call gensrc,sboxes, $(SBOXGEN)))
 
 ## Dependencies
+$(addprefix $(BUILDDIR)/,$(TARGET)): $(OBJFILES)
 $(TABLEGEN): $(SRC)/tools/tablegen.c
 $(SBOXGEN): $(SRC)/tools/sboxgen.c
 
