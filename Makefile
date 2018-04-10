@@ -9,6 +9,8 @@ RM = rm -rf
 ECHO = echo
 MKDIR = mkdir -p
 CP = cp
+PRINT = a2ps -Afill -Eplain -o paper.ps
+RUBY = ruby
 
 ## General flags and libs
 CFLAGS = -Wall -Werror
@@ -18,10 +20,6 @@ LDLIBS =
 ## Flags for optimization and debugging
 OPT_CFLAGS = -O4
 DBG_CFLAGS = -g
-
-## Special compile flags for special source files
-CFLAGS_tablegen.c = -Wno-unused-result
-CFLAGS_sboxgen.c = -Wno-unused-result
 
 ## Build commands
 COMPILE_CMD = $(CC) -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
@@ -35,20 +33,22 @@ OBJDIR = $(BUILDDIR)/objs
 GENSRC = $(BUILDDIR)/gensrc
 TOOLSDIR = $(BUILDDIR)/tools
 
+## Code generator tools
 TABLEGEN = $(TOOLSDIR)/tablegen
 SBOXGEN = $(TOOLSDIR)/sboxgen
 TOOLS = $(SBOXGEN) $(TABLEGEN)
 
 ## Object files
 OBJFILES = $(sort \
-               $(patsubst $(SRC)/data/%.data,$(OBJDIR)/%.o,$(wildcard $(SRC)/data/*.data)) \
-               $(patsubst $(SRC)/%.c,$(OBJDIR)/%.o,$(wildcard $(SRC)/*.c)) \
-               )
-
-TESTKEY = abcd1234cdef5678
+  $(patsubst $(SRC)/data/%.data,$(OBJDIR)/%.o,$(wildcard $(SRC)/data/*.data)) \
+  $(patsubst $(SRC)/%.c,$(OBJDIR)/%.o,$(wildcard $(SRC)/*.c)) \
+  )
 
 ## Default target(s)
 TARGET = DES
+
+TESTKEY = abcd1234cdef5678
+DATAFILE = $(BUILDDIR)/data.txt
 
 ### Rules
 
@@ -80,11 +80,19 @@ clean:
 
 ## Also remove editor backup files
 sweep: clean
-	@$(RM) $(SRC)/*~ *~
+	@$(RM) $(SRC)/*~ $(SRC)/tools/*~ *~
 
 ## Test
 test: $(TARGET)
 	./$(TARGET) $(TESTKEY) -i Makefile | ./$(TARGET) $(TESTKEY) -d
+
+$(DATAFILE): $(wildcard $(SRC)/data/*.data)
+	@$(MKDIR) $(dir $@)
+	@$(RUBY) $(SRC)/tools/datafile.rb $^ > $(DATAFILE)
+
+## Hardcopy (or softcopy)
+paper: $(DATAFILE)
+	@$(PRINT) Makefile $(sort $(wildcard $(SRC)/*.*)) $(DATAFILE)
 
 ## Build codegen tools
 TOOLS_CMD = $(LD) $(TOOLS_LDFLAGS) $^ $(TOOLS_LDLIBS) -o $@
@@ -120,6 +128,12 @@ $(eval $(call gensrc,sboxes, $(SBOXGEN)))
 $(addprefix $(BUILDDIR)/,$(TARGET)): $(OBJFILES)
 
 ## The first dependency for object files must be their source file
+$(OBJDIR)/F.o: $(SRC)/F.c sboxes.h $(SRC)/tables.h
+$(OBJDIR)/feistel.o: $(SRC)/feistel.c $(SRC)/F.h
+$(OBJDIR)/keygen.o: $(SRC)/keygen.c $(SRC)/tables.h
+$(OBJDIR)/main.o: $(SRC)/main.c $(SRC)/types.h $(SRC)/options.h $(SRC)/feistel.h $(SRC)/tables.h
+$(OBJDIR)/options.o: $(SRC)/options.c
+
 $(OBJDIR)/pc1.o: $(GENSRC)/pc1.c $(SRC)/types.h
 $(OBJDIR)/pc2.o: $(GENSRC)/pc2.c $(SRC)/types.h
 $(OBJDIR)/ip.o: $(GENSRC)/ip.c $(SRC)/types.h
@@ -127,12 +141,6 @@ $(OBJDIR)/pi.o: $(GENSRC)/pi.c $(SRC)/types.h
 $(OBJDIR)/e.o: $(GENSRC)/e.c $(SRC)/types.h
 $(OBJDIR)/p.o: $(GENSRC)/p.c $(SRC)/types.h
 $(OBJDIR)/sboxes.o: $(GENSRC)/sboxes.c $(SRC)/types.h
-
-$(OBJDIR)/F.o: $(SRC)/F.c
-$(OBJDIR)/options.o: $(SRC)/options.c
-$(OBJDIR)/main.o: $(SRC)/main.c
-$(OBJDIR)/keygen.o: $(SRC)/keygen.c
-$(OBJDIR)/feistel.o: $(SRC)/feistel.c
 
 ## Codegen tools
 $(TABLEGEN): $(SRC)/tools/tablegen.c
