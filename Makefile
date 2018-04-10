@@ -1,5 +1,8 @@
 # Makefile for DES
 
+### Definitions
+
+## Common tools to be used
 CC = gcc -c
 LD = gcc
 RM = rm -rf
@@ -7,19 +10,24 @@ ECHO = echo
 MKDIR = mkdir -p
 CP = cp
 
+## General flags and libs
 CFLAGS = -Wall -Werror
 LDFLAGS = -Wall -Werror
 LDLIBS =
 
+## Flags for optimization and debugging
 OPT_CFLAGS = -O4
 DBG_CFLAGS = -g
 
+## Special compile flags for special source files
 CFLAGS_tablegen.c = -Wno-unused-result
 CFLAGS_sboxgen.c = -Wno-unused-result
 
-TARGET = DES
-TESTKEY = abcd1234cdef5678
+## Build commands
+COMPILE_CMD = $(CC) -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
+LINK_CMD = $(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS)
 
+## Directories
 TOPDIR = $(shell pwd)
 SRC = $(TOPDIR)/src
 BUILDDIR = $(TOPDIR)/build
@@ -31,40 +39,54 @@ TABLEGEN = $(TOOLSDIR)/tablegen
 SBOXGEN = $(TOOLSDIR)/sboxgen
 TOOLS = $(SBOXGEN) $(TABLEGEN)
 
+## Object files
 OBJFILES = $(sort \
                $(patsubst $(SRC)/data/%.data,$(OBJDIR)/%.o,$(wildcard $(SRC)/data/*.data)) \
                $(patsubst $(SRC)/%.c,$(OBJDIR)/%.o,$(wildcard $(SRC)/*.c)) \
                )
 
+TESTKEY = abcd1234cdef5678
+
+## Default target(s)
+TARGET = DES
+
+### Rules
+
 default: $(TARGET)
+
+## Build the target and copy it to where it is expected
 $(TARGET): $(addprefix $(BUILDDIR)/,$(TARGET))
 	@$(CP) $^ $(TOPDIR)
 
-OBJ_CMD = $(CC) -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
+## Compile object files
 $(OBJFILES):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Compiling $(notdir $<)
-	@$(ECHO) '$(OBJ_CMD)' > $@.cmdline
-	@$(OBJ_CMD) 2> $@.log
+	@$(ECHO) '$(COMPILE_CMD)' > $@.cmdline
+	@$(COMPILE_CMD) 2> $@.log
 	@[ -s $@.log ] || $(RM) $@.log
 
-TARGET_CMD = $(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+## Link target(s)
 $(addprefix $(BUILDDIR)/,$(TARGET)):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Linking $(notdir $@)
-	@$(ECHO) '$(TARGET_CMD)' > $@.cmdline
-	@$(TARGET_CMD) 2> $@.log
+	@$(ECHO) '$(LINK_CMD)' > $@.cmdline
+	@$(LINK_CMD) 2> $@.log
 	@[ -s $@.log ] || $(RM) $@.log
 
+## Remove artifacts
 clean:
 	@$(RM) $(BUILDDIR) $(TARGET)
 
+## Also remove editor backup files
 sweep: clean
 	@$(RM) $(SRC)/*~ *~
 
+## Test
 test: $(TARGET)
 	./$(TARGET) $(TESTKEY) -i Makefile | ./$(TARGET) $(TESTKEY) -d
 
+## Build codegen tools
 TOOLS_CMD = $(LD) $(TOOLS_LDFLAGS) $^ $(TOOLS_LDLIBS) -o $@
 $(TOOLS):
 	@$(MKDIR) $(dir $@)
@@ -73,6 +95,7 @@ $(TOOLS):
 	@$(TOOLS_CMD) 2> $@.log
 	@[ -s $@.log ] || $(RM) $@.log
 
+## Generate C source from data files
 define gensrc
   $1_CMD = $2 $3 $4 $1 < $$< > $$@
   $(GENSRC)/$1.c:
@@ -91,20 +114,12 @@ $(eval $(call gensrc,e,$(TABLEGEN),32,48))
 $(eval $(call gensrc,p,$(TABLEGEN),32,32))
 $(eval $(call gensrc,sboxes, $(SBOXGEN)))
 
-## Dependencies
+### Dependencies
+
+## Link dependencies are all object files for the executable
 $(addprefix $(BUILDDIR)/,$(TARGET)): $(OBJFILES)
 
-$(TABLEGEN): $(SRC)/tools/tablegen.c
-$(SBOXGEN): $(SRC)/tools/sboxgen.c
-
-$(GENSRC)/pc1.c: $(SRC)/data/pc1.data $(TABLEGEN) 
-$(GENSRC)/pc2.c: $(SRC)/data/pc2.data $(TABLEGEN) 
-$(GENSRC)/ip.c: $(SRC)/data/ip.data $(TABLEGEN) 
-$(GENSRC)/pi.c: $(SRC)/data/pi.data $(TABLEGEN) 
-$(GENSRC)/e.c: $(SRC)/data/e.data $(TABLEGEN) 
-$(GENSRC)/p.c: $(SRC)/data/p.data $(TABLEGEN) 
-$(GENSRC)/sboxes.c: $(SRC)/data/sboxes.data $(SBOXGEN)
-
+## The first dependency for object files must be their source file
 $(OBJDIR)/pc1.o: $(GENSRC)/pc1.c $(SRC)/types.h
 $(OBJDIR)/pc2.o: $(GENSRC)/pc2.c $(SRC)/types.h
 $(OBJDIR)/ip.o: $(GENSRC)/ip.c $(SRC)/types.h
@@ -118,3 +133,16 @@ $(OBJDIR)/options.o: $(SRC)/options.c
 $(OBJDIR)/main.o: $(SRC)/main.c
 $(OBJDIR)/keygen.o: $(SRC)/keygen.c
 $(OBJDIR)/feistel.o: $(SRC)/feistel.c
+
+## Codegen tools
+$(TABLEGEN): $(SRC)/tools/tablegen.c
+$(SBOXGEN): $(SRC)/tools/sboxgen.c
+
+## Generated tables and sboxes
+$(GENSRC)/pc1.c: $(SRC)/data/pc1.data $(TABLEGEN)
+$(GENSRC)/pc2.c: $(SRC)/data/pc2.data $(TABLEGEN)
+$(GENSRC)/ip.c: $(SRC)/data/ip.data $(TABLEGEN)
+$(GENSRC)/pi.c: $(SRC)/data/pi.data $(TABLEGEN)
+$(GENSRC)/e.c: $(SRC)/data/e.data $(TABLEGEN)
+$(GENSRC)/p.c: $(SRC)/data/p.data $(TABLEGEN)
+$(GENSRC)/sboxes.c: $(SRC)/data/sboxes.data $(SBOXGEN)
