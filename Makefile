@@ -128,7 +128,7 @@ $(eval $(call gensrc,sboxes, $(SBOXGEN)))
 $(addprefix $(BUILDDIR)/,$(TARGET)): $(OBJFILES)
 
 ## The first dependency for object files must be their source file
-$(OBJDIR)/F.o: $(SRC)/F.c sboxes.h $(SRC)/tables.h
+$(OBJDIR)/F.o: $(SRC)/F.c $(SRC)/sboxes.h $(SRC)/tables.h
 $(OBJDIR)/feistel.o: $(SRC)/feistel.c $(SRC)/F.h
 $(OBJDIR)/keygen.o: $(SRC)/keygen.c $(SRC)/tables.h
 $(OBJDIR)/main.o: $(SRC)/main.c $(SRC)/types.h $(SRC)/options.h $(SRC)/feistel.h $(SRC)/tables.h

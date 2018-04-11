@@ -5,9 +5,8 @@
 
 int main(int argc, char **argv)
 {
-  int i = 1;
-  int c, inbits, outbits;
-  
+  int inbits, outbits, i, c;
+
   inbits = atoi(argv[1]);
   outbits = atoi(argv[2]);
 
@@ -17,11 +16,10 @@ int main(int argc, char **argv)
   printf("  WORD%d in = i;\n\n", MAX(inbits, outbits));
   
   printf("  out = \n");
-  while (!feof(stdin))
+  for (i = outbits ; i > 0 ; --i)
     {
       scanf("%d",&c);
-      printf("    (((in >> %2d) & 0x1) << %2d) |\n",(inbits - c),(outbits - i));
-      ++i;
+      printf("    (((in >> %2d) & 0x1) << %2d) |\n",(inbits - c), (i - 1));
     }
   printf("    0;\n\n  return out;\n}\n");
   
