@@ -1,5 +1,11 @@
 #include "feistel.h"
-#include "F.h"
+#include "tables.h"
+#include "sboxes.h"
+
+WORD32 F(WORD48 subkey, WORD32 right)
+{
+  return p(sboxes(e(right) ^ subkey));
+}
 
 WORD64 feistel(WORD64 inbuf, WORD48 *K)
 {

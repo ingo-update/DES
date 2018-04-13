@@ -120,7 +120,7 @@ $(eval $(call gensrc,ip,$(TABLEGEN),64,64))
 $(eval $(call gensrc,pi,$(TABLEGEN),64,64))
 $(eval $(call gensrc,e,$(TABLEGEN),32,48))
 $(eval $(call gensrc,p,$(TABLEGEN),32,32))
-$(eval $(call gensrc,sboxes, $(SBOXGEN)))
+$(eval $(call gensrc,sboxes,$(SBOXGEN)))
 
 ### Dependencies
 
@@ -128,9 +128,8 @@ $(eval $(call gensrc,sboxes, $(SBOXGEN)))
 $(addprefix $(BUILDDIR)/,$(TARGET)): $(OBJFILES)
 
 ## The first dependency for object files must be their source file
-$(OBJDIR)/F.o: $(SRC)/F.c $(SRC)/sboxes.h $(SRC)/tables.h
-$(OBJDIR)/feistel.o: $(SRC)/feistel.c $(SRC)/F.h
-$(OBJDIR)/keygen.o: $(SRC)/keygen.c $(SRC)/tables.h
+$(OBJDIR)/feistel.o: $(SRC)/feistel.c $(SRC)/types.h $(SRC)/tables.h
+$(OBJDIR)/keygen.o: $(SRC)/keygen.c $(SRC)/types.h $(SRC)/tables.h
 $(OBJDIR)/main.o: $(SRC)/main.c $(SRC)/types.h $(SRC)/options.h $(SRC)/feistel.h $(SRC)/tables.h
 $(OBJDIR)/options.o: $(SRC)/options.c
 
