@@ -76,7 +76,7 @@ $(addprefix $(BUILDDIR)/,$(TARGET)):
 
 ## Remove artifacts
 clean:
-	@$(RM) $(BUILDDIR) $(TARGET)
+	@$(RM) $(BUILDDIR) $(TARGET) paper.ps
 
 ## Also remove editor backup files
 sweep: clean
@@ -131,7 +131,7 @@ $(addprefix $(BUILDDIR)/,$(TARGET)): $(OBJFILES)
 $(OBJDIR)/feistel.o: $(SRC)/feistel.c $(SRC)/types.h $(SRC)/tables.h
 $(OBJDIR)/keygen.o: $(SRC)/keygen.c $(SRC)/types.h $(SRC)/tables.h
 $(OBJDIR)/main.o: $(SRC)/main.c $(SRC)/types.h $(SRC)/options.h $(SRC)/feistel.h $(SRC)/tables.h
-$(OBJDIR)/options.o: $(SRC)/options.c
+$(OBJDIR)/options.o: $(SRC)/options.c $(SRC)/types.h
 
 $(OBJDIR)/pc1.o: $(GENSRC)/pc1.c $(SRC)/types.h
 $(OBJDIR)/pc2.o: $(GENSRC)/pc2.c $(SRC)/types.h
