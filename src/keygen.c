@@ -33,7 +33,8 @@ WORD48 *keygen(struct options opt)
       c = (((((WORD56) c) << 28) | c) >> (28 - shift[i])) & 0xfffffff;
       d = (((((WORD56) d) << 28) | d) >> (28 - shift[i])) & 0xfffffff;
 
-      /* Do permuted choice 2 and store the result as a subkey. (reverse order if decrypting) */
+      /* Do permuted choice 2 and store the result as a subkey.
+         (reverse order if decrypting) */
       if (opt.decrypt)
 	{
 	  subkeys[15 - i] = pc2((((WORD48) c) << 28) | d);

@@ -22,7 +22,7 @@ OPT_CFLAGS = -O4
 DBG_CFLAGS = -g
 
 ## Build commands
-COMPILE_CMD = $(CC) -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
+COMPILE_CMD = $(CC) -o $@ -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $<
 LINK_CMD = $(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS)
 
 ## Directories
@@ -92,7 +92,10 @@ $(DATAFILE): $(wildcard $(SRC)/data/*.data)
 
 ## Hardcopy (or softcopy)
 paper: $(DATAFILE)
-	@$(PRINT) Makefile $(sort $(wildcard $(SRC)/*.*)) $(DATAFILE)
+	@$(PRINT) Makefile \
+	  $(sort $(wildcard $(SRC)/*)) \
+	  $(sort $(wildcard $(SRC)/tools/*)) \
+	  $(DATAFILE)
 
 ## Build codegen tools
 TOOLS_CMD = $(LD) $(TOOLS_LDFLAGS) $^ $(TOOLS_LDLIBS) -o $@
@@ -110,7 +113,7 @@ define gensrc
 	@$(MKDIR) $$(dir $$@)
 	@$(ECHO) Generating $$(notdir $$@)
 	@$(ECHO) '$$($1_CMD)' > $$@.cmdline
-	@$$($1_CMD)  2> $$@.log
+	@$$($1_CMD) 2> $$@.log
 	@[ -s $$@.log ] || $(RM) $$@.log
 endef
 
@@ -145,7 +148,7 @@ $(OBJDIR)/sboxes.o: $(GENSRC)/sboxes.c $(SRC)/types.h
 $(TABLEGEN): $(SRC)/tools/tablegen.c
 $(SBOXGEN): $(SRC)/tools/sboxgen.c
 
-## Generated tables and sboxes
+## Generated permutation tables and sboxes
 $(GENSRC)/pc1.c: $(SRC)/data/pc1.data $(TABLEGEN)
 $(GENSRC)/pc2.c: $(SRC)/data/pc2.data $(TABLEGEN)
 $(GENSRC)/ip.c: $(SRC)/data/ip.data $(TABLEGEN)
