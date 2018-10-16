@@ -9,6 +9,7 @@ RM = rm -rf
 ECHO = echo
 MKDIR = mkdir -p
 CP = cp
+DIFF = diff
 PRINT = a2ps -Afill -Eplain -o paper.ps
 RUBY = ruby
 
@@ -47,6 +48,7 @@ OBJFILES = $(sort \
 ## Default target(s)
 TARGET = DES
 
+TESTFILE = $(BUILDDIR)/test/testfile
 TESTKEY = abcd1234cdef5678
 DATAFILE = $(BUILDDIR)/data.txt
 
@@ -84,7 +86,9 @@ sweep: clean
 
 ## Test
 test: $(TARGET)
-	./$(TARGET) $(TESTKEY) -i Makefile | ./$(TARGET) $(TESTKEY) -d
+	@$(MKDIR) $(dir $(TESTFILE))
+	@./$(TARGET) $(TESTKEY) -i Makefile | ./$(TARGET) $(TESTKEY) -d > $(TESTFILE)
+	@$(DIFF) Makefile $(TESTFILE) && $(ECHO) SUCCESS
 
 $(DATAFILE): $(wildcard $(SRC)/data/*.data)
 	@$(MKDIR) $(dir $@)

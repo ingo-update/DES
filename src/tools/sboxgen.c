@@ -3,14 +3,14 @@
 /*-----------------------------------------------------------------------------
  * Function: int main()
  *
- * Purpose: 
+ * Purpose:
  * The S-Boxes in the book are tables of 4 rows and 16 columns, where the
- * column addres is b4b3b2b1 and the row addres is b5b0. This program 
- * converts the tables to linear arrays where the addres is b5b4b3b2b1b0. 
+ * column addres is b4b3b2b1 and the row addres is b5b0. This program
+ * converts the tables to linear arrays where the addres is b5b4b3b2b1b0.
  *
  * If the S-Box data are read into a table then the mapping is as follows:
- * 
- *      000000 -> row = 00 column = 0000 : table elemant 0
+ *
+ *      000000 -> row = 00 column = 0000 : table element 0
  *      000001 -> row = 01 column = 0000 : table element 15
  *      000010 -> row = 00 column = 0001 : table element 1
  * ...
@@ -72,6 +72,6 @@ int main()
       printf("    s%d[(WORD6) ((in >> %2d) & 0x3f)] << %2d |\n",i+1, 6*(7-i), 4*(7-i));
     }
   printf("    0;\n}\n");
-  
+
   return 0;
 }
