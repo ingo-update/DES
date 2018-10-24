@@ -49,7 +49,7 @@ OBJFILES = $(sort \
 TARGET = DES
 
 TESTFILE = $(BUILDDIR)/test/testfile
-TESTKEY = abcd1234cdef5678
+TESTKEY = 1234567890abcdef
 DATAFILE = $(BUILDDIR)/data.txt
 
 ### Rules
