@@ -1,105 +1,14 @@
 # Makefile for DES
 
-### Definitions
+TARGET = DES
+EXTRA_OBJS = $(patsubst $(SRC)/data/%.data,$(OBJDIR)/%.o,$(wildcard $(SRC)/data/*.data))
 
-## Common tools to be used
-CC = gcc -c
-LD = gcc
-RM = rm -rf
-ECHO = echo
-MKDIR = mkdir -p
-CP = cp
-DIFF = diff
-PRINT = a2ps -Afill -Eplain -o paper.ps
-RUBY = ruby
-
-## General flags and libs
-CFLAGS = -Wall -Werror
-LDFLAGS = -Wall -Werror
-LDLIBS =
-
-## Flags for optimization and debugging
-OPT_CFLAGS = -O4
-DBG_CFLAGS = -g
-
-## Build commands
-COMPILE_CMD = $(CC) -o $@ -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $<
-LINK_CMD = $(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS)
-
-## Directories
-TOPDIR = $(shell pwd)
-SRC = $(TOPDIR)/src
-BUILDDIR = $(TOPDIR)/build
-OBJDIR = $(BUILDDIR)/objs
-GENSRC = $(BUILDDIR)/gensrc
-TOOLSDIR = $(BUILDDIR)/tools
+include make/build.gmk
 
 ## Code generator tools
 TABLEGEN = $(TOOLSDIR)/tablegen
 SBOXGEN = $(TOOLSDIR)/sboxgen
 TOOLS = $(SBOXGEN) $(TABLEGEN)
-
-## Object files
-OBJFILES = $(sort \
-  $(patsubst $(SRC)/data/%.data,$(OBJDIR)/%.o,$(wildcard $(SRC)/data/*.data)) \
-  $(patsubst $(SRC)/%.c,$(OBJDIR)/%.o,$(wildcard $(SRC)/*.c)) \
-  )
-
-## Default target(s)
-TARGET = DES
-
-TESTFILE = $(BUILDDIR)/test/testfile
-TESTKEY = 1234567890abcdef
-DATAFILE = $(BUILDDIR)/data.txt
-
-### Rules
-
-default: $(TARGET)
-
-## Build the target and copy it to where it is expected
-$(TARGET): $(addprefix $(BUILDDIR)/,$(TARGET))
-	@$(CP) $^ $(TOPDIR)
-
-## Compile object files
-$(OBJFILES):
-	@$(MKDIR) $(dir $@)
-	@$(ECHO) Compiling $(notdir $<)
-	@$(ECHO) '$(COMPILE_CMD)' > $@.cmdline
-	@$(COMPILE_CMD) 2> $@.log
-	@[ -s $@.log ] || $(RM) $@.log
-
-## Link target(s)
-$(addprefix $(BUILDDIR)/,$(TARGET)):
-	@$(MKDIR) $(dir $@)
-	@$(ECHO) Linking $(notdir $@)
-	@$(ECHO) '$(LINK_CMD)' > $@.cmdline
-	@$(LINK_CMD) 2> $@.log
-	@[ -s $@.log ] || $(RM) $@.log
-
-## Remove artifacts
-clean:
-	@$(RM) $(BUILDDIR) $(TARGET) paper.ps
-
-## Also remove editor backup files
-sweep: clean
-	@$(RM) $(SRC)/*~ $(SRC)/tools/*~ *~
-
-## Test
-test: $(TARGET)
-	@$(MKDIR) $(dir $(TESTFILE))
-	@./$(TARGET) $(TESTKEY) -i Makefile | ./$(TARGET) $(TESTKEY) -d > $(TESTFILE)
-	@$(DIFF) Makefile $(TESTFILE) && $(ECHO) SUCCESS
-
-$(DATAFILE): $(wildcard $(SRC)/data/*.data)
-	@$(MKDIR) $(dir $@)
-	@$(RUBY) $(SRC)/tools/datafile.rb $^ > $(DATAFILE)
-
-## Hardcopy (or softcopy)
-paper: $(DATAFILE)
-	@$(PRINT) Makefile \
-	  $(sort $(wildcard $(SRC)/*)) \
-	  $(sort $(wildcard $(SRC)/tools/*)) \
-	  $(DATAFILE)
 
 ## Build codegen tools
 TOOLS_CMD = $(LD) $(TOOLS_LDFLAGS) $^ $(TOOLS_LDLIBS) -o $@
@@ -128,6 +37,22 @@ $(eval $(call gensrc,pi,$(TABLEGEN),64,64))
 $(eval $(call gensrc,e,$(TABLEGEN),32,48))
 $(eval $(call gensrc,p,$(TABLEGEN),32,32))
 $(eval $(call gensrc,sboxes,$(SBOXGEN)))
+
+DATAFILE = $(BUILDDIR)/data.txt
+$(DATAFILE): $(wildcard $(SRC)/data/*.data)
+	@$(MKDIR) $(dir $@)
+	@$(RUBY) $(SRC)/tools/datafile.rb $^ > $(DATAFILE)
+
+paper: $(DATAFILE)
+
+## Test
+TESTFILE = $(BUILDDIR)/test/testfile
+TESTKEY = 1234567890abcdef
+
+test: $(TARGET)
+	@$(MKDIR) $(dir $(TESTFILE))
+	@./$(TARGET) $(TESTKEY) -i Makefile | ./$(TARGET) $(TESTKEY) -d > $(TESTFILE)
+	@$(DIFF) -B Makefile $(TESTFILE) && $(ECHO) SUCCESS
 
 ### Dependencies
 
