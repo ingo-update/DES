@@ -8,6 +8,10 @@ CP = cp
 PRINT = a2ps -Afill -Eplain -o paper.ps
 DIFF = diff
 RUBY = ruby
+LEX = flex
+YACC = bison
+CD = cd
+XV = gpicview
 CAT = cat
 
 ## General flags and libs

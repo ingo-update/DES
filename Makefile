@@ -11,7 +11,7 @@ SBOXGEN = $(TOOLSDIR)/sboxgen
 TOOLS = $(SBOXGEN) $(TABLEGEN)
 
 ## Build codegen tools
-TOOLS_CMD = $(LD) $(TOOLS_LDFLAGS) $^ $(TOOLS_LDLIBS) -o $@
+TOOLS_CMD = $(LD) $(LDFLAGS_$@) $^ $(LDLIBS_$@) -o $@
 $(TOOLS):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Building tool $(notdir $@)

@@ -1,34 +1,77 @@
+### Generic Makefile for C projects ###
+
 ifdef SPEC
   include SPEC
 else
   include make/spec.gmk
 endif
 
+### Directories
+
 TOPDIR = $(shell pwd)
 SRC = $(TOPDIR)/src
+
+# All build artifacts and temporaries go into $(BUILDDIR)
 BUILDDIR = $(TOPDIR)/build
-OBJDIR = $(BUILDDIR)/objs
 TOOLSDIR = $(BUILDDIR)/tools
 GENSRC = $(BUILDDIR)/gensrc
+OBJDIR = $(BUILDDIR)/objs
+TESTDIR = $(BUILDDIR)/test
 
-SRCFILES = $(sort Makefile $(wildcard make/*.gmk $(SRC)/*.h $(SRC)/*.c))
+### File lists
+
+SRCFILES = $(TOPDIR)/Makefile $(wildcard $(TOPDIR)/make/*.gmk $(SRC)/*.h $(SRC)/*.c)
 OBJFILES = $(sort $(patsubst $(SRC)/%.c,$(OBJDIR)/%.o,$(wildcard $(SRC)/*.c)) $(EXTRA_OBJS))
+TESTOBJS = $(sort $(patsubst $(TOPDIR)/test/%.c,$(TESTDIR)/%.o,$(wildcard $(TOPDIR)/test/*.c)))
+ALL_TESTS = $(patsubst $(TOPDIR)/test/%.c,$(TESTDIR)/%,$(wildcard $(TOPDIR)/test/test-*.c))
+
+### Generic build commands for use in rules
 
 COMPILE_CMD = $(CC) -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
 LINK_CMD = $(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS)
+LEX_CMD = $(LEX) -t $< > $@
+YACC_CMD = $(YACC) -d -o $(PARSER) $<
+
+PARSER_H = $(patsubst %.c,%.h,$(PARSER))
+
+### Targets
+
+## Default target(s)
 
 default: $(TARGET)
 
 $(TARGET): $(addprefix $(BUILDDIR)/,$(TARGET))
 	@$(CP) $^ $(TOPDIR)
 
-$(OBJFILES):
+## Generated source
+
+# A tokeniser built with $(LEX)
+$(LEXER):
+	@$(MKDIR) $(dir $@)
+	@$(ECHO) Generating $(notdir $@)
+	@$(ECHO) '$(LEX_CMD)' > $@.cmdline
+	@$(LEX_CMD) 2> $@.log
+	@[ -s $@.log ] || $(RM) $@.log
+
+# A syntax analyser built with $(YACC)
+$(PARSER) $(PARSER_H):
+	@$(MKDIR) $(dir $@)
+	@$(ECHO) Generating $(notdir $(PARSER)), $(notdir $(PARSER_H))
+	@$(ECHO) '$(YACC_CMD)' > $@.cmdline
+	@$(YACC_CMD) 2> $@.log
+	@[ -s $@.log ] || $(RM) $@.log
+
+## Compilation and linking
+
+# Compile C source into object files
+$(OBJFILES) $(TESTOBJS):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Compiling $(notdir $<)
 	@$(ECHO) '$(COMPILE_CMD)' > $@.cmdline
 	@$(COMPILE_CMD) 2> $@.log
 	@[ -s $@.log ] || $(RM) $@.log
 
+# Link object files into the target executable(s)
 $(addprefix $(BUILDDIR)/,$(TARGET)):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Linking $(notdir $@)
@@ -36,11 +79,26 @@ $(addprefix $(BUILDDIR)/,$(TARGET)):
 	@$(LINK_CMD) 2> $@.log
 	@[ -s $@.log ] || $(RM) $@.log
 
+
+# Link and run unit tests
+$(ALL_TESTS):
+	@$(ECHO) Linking $(notdir $@)
+	@$(LD) -o $@ $(LDFLAGS_$@) $^
+	@$(ECHO) Running $(notdir $@)
+	@$(CD) $(dir $@) && $@ 2> $@.log
+
+test: $(ALL_TESTS)
+
+## Housekeeping
+
+# Remove all build artifacts
 clean:
 	@$(RM) $(BUILDDIR) $(TARGET)
 
+# Also remove editor backup files
 sweep: clean
 	@$(RM) $(SRC)/*~ *~
 
+# Print source
 paper: $(SRCFILES)
-	$(PRINT) $^
+	$(PRINT) $(sort $^)
