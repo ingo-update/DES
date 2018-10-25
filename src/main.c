@@ -11,11 +11,11 @@ int main(int argc, char **argv)
 {
   struct options opt;
   FILE *in;
-  FILE *out;  
+  FILE *out;
   WORD48 *K;
   WORD64 inbuf, outbuf;
   int bytes;
-  
+
   /* Parse command line options. */
   opt = parse_options(argc, argv);
 
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	  exit(EXIT_FAILURE);
 	}
     }
-  
+
   if (NULL == opt.outfile)
     {
       out = stdout;
@@ -50,22 +50,22 @@ int main(int argc, char **argv)
 	  exit(EXIT_FAILURE);
 	}
     }
-  
+
   /* Main loop */
   while (!feof(in))
     {
-      inbuf = 0;
+      inbuf = 0x0a0a0a0a0a0a0a0a;
       bytes = fread(&inbuf, 1, 8, in);
-            
+
       if (0 != bytes)
 	{
 	  outbuf = pi(feistel(ip(inbuf), K));
 	  fwrite(&outbuf, 1, 8, out);
 	}
     }
-  
+
   fclose(in);
   fclose(out);
-  
+
   return EXIT_SUCCESS;
 }
