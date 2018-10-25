@@ -1,0 +1,19 @@
+## Common tools to be used
+CC = gcc -c
+LD = gcc
+RM = rm -rf
+ECHO = echo
+MKDIR = mkdir -p
+CP = cp
+PRINT = a2ps -Afill -Eplain -o paper.ps
+DIFF = diff
+RUBY = ruby
+
+## General flags and libs
+CFLAGS = -Wall -Werror
+LDFLAGS = -Wall -Werror
+LDLIBS =
+
+## Flags for optimization and debugging
+OPT_CFLAGS = -O4
+DBG_CFLAGS = -g

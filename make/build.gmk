@@ -1,0 +1,46 @@
+ifdef SPEC
+  include SPEC
+else
+  include make/spec.gmk
+endif
+
+TOPDIR = $(shell pwd)
+SRC = $(TOPDIR)/src
+BUILDDIR = $(TOPDIR)/build
+OBJDIR = $(BUILDDIR)/objs
+TOOLSDIR = $(BUILDDIR)/tools
+GENSRC = $(BUILDDIR)/gensrc
+
+SRCFILES = $(sort Makefile $(wildcard make/*.gmk $(SRC)/*.h $(SRC)/*.c))
+OBJFILES = $(sort $(patsubst $(SRC)/%.c,$(OBJDIR)/%.o,$(wildcard $(SRC)/*.c)) $(EXTRA_OBJS))
+
+COMPILE_CMD = $(CC) -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
+LINK_CMD = $(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS)
+
+default: $(TARGET)
+
+$(TARGET): $(addprefix $(BUILDDIR)/,$(TARGET))
+	@$(CP) $^ $(TOPDIR)
+
+$(OBJFILES):
+	@$(MKDIR) $(dir $@)
+	@$(ECHO) Compiling $(notdir $<)
+	@$(ECHO) '$(COMPILE_CMD)' > $@.cmdline
+	@$(COMPILE_CMD) 2> $@.log
+	@[ -s $@.log ] || $(RM) $@.log
+
+$(addprefix $(BUILDDIR)/,$(TARGET)):
+	@$(MKDIR) $(dir $@)
+	@$(ECHO) Linking $(notdir $@)
+	@$(ECHO) '$(LINK_CMD)' > $@.cmdline
+	@$(LINK_CMD) 2> $@.log
+	@[ -s $@.log ] || $(RM) $@.log
+
+clean:
+	@$(RM) $(BUILDDIR) $(TARGET)
+
+sweep: clean
+	@$(RM) $(SRC)/*~ *~
+
+paper: $(SRCFILES)
+	$(PRINT) $^
