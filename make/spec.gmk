@@ -8,6 +8,7 @@ CP = cp
 PRINT = a2ps -Afill -Eplain -o paper.ps
 DIFF = diff
 RUBY = ruby
+CAT = cat
 
 ## General flags and libs
 CFLAGS = -Wall -Werror

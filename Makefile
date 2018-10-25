@@ -46,13 +46,16 @@ $(DATAFILE): $(wildcard $(SRC)/data/*.data)
 paper: $(DATAFILE)
 
 ## Test
-TESTFILE = $(BUILDDIR)/test/testfile
 TESTKEY = 1234567890abcdef
+TESTFILE = $(BUILDDIR)/test/testfile
+$(TESTFILE): $(SRCFILES)
+	@$(MKDIR) $(dir $@)
+	@$(CAT) $^ > $@
 
-test: $(TARGET)
-	@$(MKDIR) $(dir $(TESTFILE))
-	@./$(TARGET) $(TESTKEY) -i Makefile | ./$(TARGET) $(TESTKEY) -d > $(TESTFILE)
-	@$(DIFF) -B Makefile $(TESTFILE) && $(ECHO) SUCCESS
+test: $(TARGET) $(TESTFILE)
+	@$(CP) $(TESTFILE) $(TESTFILE).orig
+	@./$(TARGET) $(TESTKEY) -i $(TESTFILE).orig | ./$(TARGET) $(TESTKEY) -d > $(TESTFILE)
+	@$(DIFF) -B $(TESTFILE).orig $(TESTFILE) && $(ECHO) SUCCESS
 
 ### Dependencies
 
