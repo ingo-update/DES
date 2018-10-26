@@ -97,7 +97,7 @@ clean:
 
 # Also remove editor backup files
 sweep: clean
-	@$(RM) $(SRC)/*~ *~
+	@$(RM) $(SRC)/*~ $(TOPDIR)/test/*~ *~
 
 # Print source
 paper: $(SRCFILES)
