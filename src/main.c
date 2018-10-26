@@ -19,6 +19,12 @@ int main(int argc, char **argv)
   /* Parse command line options. */
   opt = parse_options(argc, argv);
 
+  if (0 == opt.valid)
+    {
+      fprintf(stderr, "Invalid options.\n");
+      exit(EXIT_FAILURE);
+    }
+
   /* Generate subkeys */
   K = keygen(opt);
 
