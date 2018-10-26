@@ -88,3 +88,7 @@ $(GENSRC)/pi.c: $(SRC)/data/pi.data $(TABLEGEN)
 $(GENSRC)/e.c: $(SRC)/data/e.data $(TABLEGEN)
 $(GENSRC)/p.c: $(SRC)/data/p.data $(TABLEGEN)
 $(GENSRC)/sboxes.c: $(SRC)/data/sboxes.data $(SBOXGEN)
+
+$(TESTDIR)/test-options.o: $(TOPDIR)/test/test-options.c $(SRC)/options.c $(SRC)/options.h $(SRC)/types.h
+
+$(TESTDIR)/test-options: $(TESTDIR)/test-options.o $(OBJDIR)/options.o
