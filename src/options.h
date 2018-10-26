@@ -7,9 +7,10 @@
 struct options
 {
   WORD64 key;
-  int decrypt;
   char *infile;
   char *outfile;
+  int decrypt;
+  int valid;
 };
 
 struct options parse_options(int argc, char **argv);
