@@ -60,7 +60,7 @@ int main(int argc, char **argv)
   /* Main loop */
   while (!feof(in))
     {
-      inbuf = 0x0a0a0a0a0a0a0a0a;
+      inbuf = 0x0a0a0a0a0a0a0a0a; // Pad with newlines
       bytes = fread(&inbuf, 1, 8, in);
 
       if (0 != bytes)

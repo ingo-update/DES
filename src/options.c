@@ -34,7 +34,7 @@ static WORD64 _readkey(char *keystring, int *valid)
 	}
       else
 	{
-	  fprintf(stderr, "Illegal key character %c\n", k);
+	  fprintf(stderr, "Illegal key character '%c'\n", k);
 	  *valid = 0;
 	  return 0;
 	}
