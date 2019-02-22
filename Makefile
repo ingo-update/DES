@@ -4,6 +4,7 @@ TARGET = DES
 EXTRA_OBJS = $(patsubst $(SRC)/data/%.data,$(OBJDIR)/%.o,$(wildcard $(SRC)/data/*.data))
 
 include make/build.gmk
+include make/test.gmk
 
 ## Code generator tools
 TABLEGEN = $(TOOLSDIR)/tablegen

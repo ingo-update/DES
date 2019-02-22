@@ -1,7 +1,7 @@
 ### Generic Makefile for C projects ###
 
 ifdef SPEC
-  include SPEC
+  include $(SPEC)
 else
   include make/spec.gmk
 endif
@@ -16,18 +16,15 @@ BUILDDIR = $(TOPDIR)/build
 TOOLSDIR = $(BUILDDIR)/tools
 GENSRC = $(BUILDDIR)/gensrc
 OBJDIR = $(BUILDDIR)/objs
-TESTDIR = $(BUILDDIR)/test
 
 ### File lists
 
 SRCFILES = $(TOPDIR)/Makefile $(wildcard $(TOPDIR)/make/*.gmk $(SRC)/*.h $(SRC)/*.c)
 OBJFILES = $(sort $(patsubst $(SRC)/%.c,$(OBJDIR)/%.o,$(wildcard $(SRC)/*.c)) $(EXTRA_OBJS))
-TESTOBJS = $(sort $(patsubst $(TOPDIR)/test/%.c,$(TESTDIR)/%.o,$(wildcard $(TOPDIR)/test/*.c)))
-ALL_TESTS = $(patsubst $(TOPDIR)/test/%.c,$(TESTDIR)/%,$(wildcard $(TOPDIR)/test/test-*.c))
 
 ### Generic build commands for use in rules
 
-COMPILE_CMD = $(CC) -I$(SRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
+COMPILE_CMD = $(CC) -I$(SRC) -I$(GENSRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
 LINK_CMD = $(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS)
 LEX_CMD = $(LEX) -t $< > $@
 YACC_CMD = $(YACC) -d -o $(PARSER) $<
@@ -64,12 +61,14 @@ $(PARSER) $(PARSER_H):
 ## Compilation and linking
 
 # Compile C source into object files
-$(OBJFILES) $(TESTOBJS):
+$(OBJFILES):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Compiling $(notdir $<)
 	@$(ECHO) '$(COMPILE_CMD)' > $@.cmdline
-	@$(COMPILE_CMD) 2> $@.log
+	@-$(COMPILE_CMD) 2> $@.log
 	@[ -s $@.log ] || $(RM) $@.log
+	@$(CAT) 2> /dev/null $@.log || true
+	@[ ! -e $@.log ]
 
 # Link object files into the target executable(s)
 $(addprefix $(BUILDDIR)/,$(TARGET)):
@@ -79,16 +78,6 @@ $(addprefix $(BUILDDIR)/,$(TARGET)):
 	@$(LINK_CMD) 2> $@.log
 	@[ -s $@.log ] || $(RM) $@.log
 
-
-# Link and run unit tests
-$(ALL_TESTS):
-	@$(ECHO) Linking $(notdir $@)
-	@$(LD) -o $@ $(LDFLAGS_$@) $^
-	@$(ECHO) Running $(notdir $@)
-	@$(CD) $(dir $@) && $@ 2> $@.log
-
-test: $(ALL_TESTS)
-
 ## Housekeeping
 
 # Remove all build artifacts
@@ -97,8 +86,8 @@ clean:
 
 # Also remove editor backup files
 sweep: clean
-	@$(RM) $(SRC)/*~ $(TOPDIR)/test/*~ *~
+	@$(RM) *~ $(SRC)/*~ $(TOPDIR)/test/*~ $(TOPDIR)/make/*~ $(TOPDIR)/examples/*~
 
 # Print source
 paper: $(SRCFILES)
-	$(PRINT) $(sort $^)
+	@$(PRINT) $(sort $^)
