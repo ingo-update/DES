@@ -1,0 +1,25 @@
+TESTDIR = $(BUILDDIR)/test
+
+TESTOBJS = $(sort $(patsubst $(TOPDIR)/test/%.c,$(TESTDIR)/%.o,$(wildcard $(TOPDIR)/test/*.c)))
+ALL_TESTS = $(sort $(patsubst $(TOPDIR)/test/%.c,$(TESTDIR)/%,$(wildcard $(TOPDIR)/test/test-*.c)))
+
+TEST_COMPILE_CMD = $(CC) -I$(SRC) -I$(GENSRC) $(CFLAGS) $(OPT_CFLAGS) $(DBG_CFLAGS) $(CFLAGS_$(notdir $<)) $< -o $@
+TEST_LINK_CMD = $(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS)
+
+$(TESTOBJS):
+	@$(MKDIR) $(dir $@)
+	@$(ECHO) Compiling test $(notdir $<)
+	@$(ECHO) '$(TEST_COMPILE_CMD)' > $@.cmdline
+	@-$(TEST_COMPILE_CMD) 2> $@.log
+	@[ -s $@.log ] || $(RM) $@.log
+	@$(CAT) 2> /dev/null $@.log || true
+	@[ ! -e $@.log ]
+
+# Link and run unit tests TODO: Create .log and .cmdline files for the LD command.
+$(ALL_TESTS):
+	@$(ECHO) Linking $(notdir $@)
+	@$(LD) -o $@ $(LDFLAGS_$(notdir $@)) $^ $(LDLIBS_$(notdir $@))
+	@$(ECHO) Running $(notdir $@)
+	@$(CD) $(dir $@) && $@ 2> $@.log
+
+test: $(ALL_TESTS)
