@@ -65,7 +65,7 @@ $(OBJFILES):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Compiling $(notdir $<)
 	@$(ECHO) '$(COMPILE_CMD)' > $@.cmdline
-	@-$(COMPILE_CMD) 2> $@.log
+	@-$(COMPILE_CMD) 2> $@.log || true
 	@[ -s $@.log ] || $(RM) $@.log
 	@$(CAT) 2> /dev/null $@.log || true
 	@[ ! -e $@.log ]
@@ -75,8 +75,10 @@ $(addprefix $(BUILDDIR)/,$(TARGET)):
 	@$(MKDIR) $(dir $@)
 	@$(ECHO) Linking $(notdir $@)
 	@$(ECHO) '$(LINK_CMD)' > $@.cmdline
-	@$(LINK_CMD) 2> $@.log
+	@$(LINK_CMD) 2> $@.log || true
 	@[ -s $@.log ] || $(RM) $@.log
+	@$(CAT) 2> /dev/null $@.log || true
+	@[ ! -e $@.log ]
 
 ## Housekeeping
 
