@@ -25,6 +25,9 @@ $(UNIT_TESTS):
 	@$(CAT) 2> /dev/null $@.log || true
 	@[ ! -e $@.log ]
 	@$(ECHO) Running $(notdir $@)
-	@$ $@ 2> $@.testlog
+	@$(RM) $@.failed
+	@$@ 2> $@.testlog || $(ECHO) true > $@.failed
+	@[ ! -e $@.failed ] || $(CAT) $@.testlog
+	@[ ! -e $@.failed ]
 
 test: $(UNIT_TESTS)
