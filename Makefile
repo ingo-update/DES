@@ -55,7 +55,8 @@ $(TESTFILE): $(SRCFILES)
 
 test: $(TARGET) $(TESTFILE)
 	@$(CP) $(TESTFILE) $(TESTFILE).orig
-	@./$(TARGET) $(TESTKEY) -i $(TESTFILE).orig | ./$(TARGET) $(TESTKEY) -d > $(TESTFILE)
+	@./$(TARGET) $(TESTKEY) -i $(TESTFILE).orig -o $(TESTFILE).crypt
+	@./$(TARGET) $(TESTKEY) -d -i $(TESTFILE).crypt -o $(TESTFILE)
 	@$(DIFF) -B $(TESTFILE).orig $(TESTFILE) && $(ECHO) SUCCESS
 
 ### Dependencies
