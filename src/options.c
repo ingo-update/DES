@@ -39,6 +39,8 @@ static WORD64 _readkey(char *keystring, int *valid)
 	  return 0;
 	}
     }
+
+  *valid = 1;
   return key;
 }
 
@@ -57,8 +59,8 @@ struct options parse_options(int argc, char **argv)
 	{
 	  if (16 == strlen(argv[i]))
 	    {
-	      opt.valid = 1;
 	      opt.key = _readkey(argv[i], &opt.valid);
+	      if (opt.valid == 0) _print_usage(argv[0]);
 	    }
 	  else
 	    {

@@ -5,7 +5,8 @@
 #include "options.h"
 
 /* Some option arrays */
-char *illegal_key[] = {"test", "abcd"};
+char *short_key[] = {"test", "abcd"};
+char *long_key[] = {"test", "12345678901234567890"};
 char *illegal_option[] = {"test", "-a", "-b"};
 char *bad_key[] = {"test", "abcdefghijklmnop"};
 char *good_key[] = {"test", "1111222233334444"};
@@ -28,11 +29,18 @@ int test_options()
       fprintf(stderr, "FAIL: Accepted empty options.\n");
     }
 
-  o1 = parse_options(2, illegal_key);
+  o1 = parse_options(2, short_key);
   if (0 != o1.valid)
     {
       ++fail;
-      fprintf(stderr, "FAIL: Accepted too short key '%s'.\n", illegal_key[0]);
+      fprintf(stderr, "FAIL: Accepted too short key '%s'.\n", short_key[0]);
+    }
+
+  o1 = parse_options(2, long_key);
+  if (0 != o1.valid)
+    {
+      ++fail;
+      fprintf(stderr, "FAIL: Accepted too long key '%s'.\n", long_key[0]);
     }
 
   o1 = parse_options(3, illegal_option);
