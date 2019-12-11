@@ -93,6 +93,8 @@ $(GENSRC)/sboxes.c: $(SRC)/data/sboxes.data $(SBOXGEN)
 
 $(TESTDIR)/test-options.o: $(TOPDIR)/test/test-options.c $(SRC)/options.c $(SRC)/options.h $(SRC)/types.h
 $(TESTDIR)/test-keygen.o: $(TOPDIR)/test/test-keygen.c $(SRC)/options.h $(SRC)/types.h $(SRC)/data/pc1.data $(SRC)/data/pc2.data
+$(TESTDIR)/test-types.o: $(TOPDIR)/test/test-types.c $(SRC)/types.h
 
 $(TESTDIR)/test-options: $(TESTDIR)/test-options.o $(OBJDIR)/options.o
 $(TESTDIR)/test-keygen: $(TESTDIR)/test-keygen.o $(OBJDIR)/keygen.o $(OBJDIR)/pc1.o $(OBJDIR)/pc2.o
+$(TESTDIR)/test-types: $(TESTDIR)/test-types.o
