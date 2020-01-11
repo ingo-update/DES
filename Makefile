@@ -1,10 +1,15 @@
 # Makefile for DES
 
 TARGET = DES
+ifndef MAKEDIR
+  MAKEDIR = ../make
+endif
+
+SPEC = $(MAKEDIR)/spec.gmk
 EXTRA_OBJS = $(patsubst $(SRC)/data/%.data,$(OBJDIR)/%.o,$(wildcard $(SRC)/data/*.data))
 
-include make/build.gmk
-include make/test.gmk
+include $(MAKEDIR)/build.gmk
+include $(MAKEDIR)/test.gmk
 
 ## Code generator tools
 TABLEGEN = $(TOOLSDIR)/tablegen
