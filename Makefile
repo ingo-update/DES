@@ -63,6 +63,8 @@ test: $(TARGET) $(TESTFILE)
 	@./$(TARGET) $(TESTKEY) -i $(TESTFILE).orig -o $(TESTFILE).crypt
 	@./$(TARGET) $(TESTKEY) -d -i $(TESTFILE).crypt -o $(TESTFILE)
 	@$(DIFF) -B $(TESTFILE).orig $(TESTFILE) && $(ECHO) SUCCESS
+	@$(DIFF) -B $(TESTFILE).orig $(TESTFILE) || $(ECHO) FAILURE
+
 
 ### Dependencies
 
