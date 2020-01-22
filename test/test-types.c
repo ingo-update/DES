@@ -14,7 +14,7 @@ int test_type_sizes()
     }
   if (sizeof(WORD56) < 56 / 8)
     {
-      fprintf(stderr, "Failure: WORD65 is too short: (%d)\n", (int) sizeof(WORD56));
+      fprintf(stderr, "Failure: WORD56 is too short: (%d)\n", (int) sizeof(WORD56));
       ++fail;
     }
   if (sizeof(WORD48) < 48 / 8)
