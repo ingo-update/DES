@@ -108,5 +108,15 @@ int main()
 
   fail += test_options();
 
-  return fail;
+  fprintf(stdout, "test_options: ");
+  if (0 == fail)
+    {
+      fprintf(stdout, "SUCCESS\n");
+      exit(EXIT_SUCCESS);
+    }
+  else
+    {
+      fprintf(stdout, "FAILURE; %d tests failed.\n", fail);
+      exit(EXIT_FAILURE);
+    }
 }

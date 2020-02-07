@@ -45,14 +45,15 @@ int main()
       fail += test_type_sizes();
     }
 
-  if (fail)
+  fprintf(stdout, "test_types: ");
+  if (0 == fail)
     {
-      fprintf(stderr, "FAILURE, %d tests failed\n", fail);
-      return EXIT_FAILURE;
+      fprintf(stdout, "SUCCESS\n");
+      exit(EXIT_SUCCESS);
     }
   else
     {
-      fprintf(stderr, "SUCCESS\n");
-      return EXIT_SUCCESS;
+      fprintf(stdout, "FAILURE; %d tests failed.\n", fail);
+      exit(EXIT_FAILURE);
     }
 }
