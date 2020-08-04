@@ -2,16 +2,16 @@
 #include "tables.h"
 #include "sboxes.h"
 
-WORD32 F(WORD48 subkey, WORD32 right)
+WORD32 F(WORD48 k, WORD32 x)
 {
-  return p(sboxes(e(right) ^ subkey));
+  return p(k ^ sboxes(e(x)));
 }
 
 WORD64 feistel(WORD64 inbuf, WORD48 *K)
 {
   WORD32 left, right, temp;
   int i;
-  
+
   right = inbuf & 0xffffffff;
   left = (inbuf >> 32) & 0xffffffff;
 

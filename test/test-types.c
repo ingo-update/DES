@@ -5,7 +5,9 @@
 
 int test_type_sizes()
 {
-  int fail = 0;
+  int fail;
+
+  fail = 0;
 
   if (sizeof(WORD64) < 64 / 8)
     {
@@ -38,12 +40,11 @@ int test_type_sizes()
 
 int main()
 {
-  int fail = 0;
+  int fail;
 
-  if (0 == fail)
-    {
-      fail += test_type_sizes();
-    }
+  fail = 0;
+
+  fail += test_type_sizes();
 
   fprintf(stdout, "test_types: ");
   if (0 == fail)
