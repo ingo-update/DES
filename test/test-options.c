@@ -104,19 +104,21 @@ int test_options()
 
 int main()
 {
-  int fail = 0;
+  int fail;
+
+  fprintf(stdout, "test_options: ");
+  fail = 0;
 
   fail += test_options();
 
-  fprintf(stdout, "test_options: ");
   if (0 == fail)
     {
       fprintf(stdout, "SUCCESS\n");
-      exit(EXIT_SUCCESS);
+      return EXIT_SUCCESS;
     }
   else
     {
       fprintf(stdout, "FAILURE; %d tests failed.\n", fail);
-      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
     }
 }

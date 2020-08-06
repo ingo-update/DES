@@ -38,22 +38,21 @@ int test_type_sizes()
 
 int main()
 {
-  int fail = 0;
-
-  if (0 == fail)
-    {
-      fail += test_type_sizes();
-    }
+  int fail;
 
   fprintf(stdout, "test_types: ");
+  fail = 0;
+
+  fail += test_type_sizes();
+
   if (0 == fail)
     {
       fprintf(stdout, "SUCCESS\n");
-      exit(EXIT_SUCCESS);
+      return EXIT_SUCCESS;
     }
   else
     {
       fprintf(stdout, "FAILURE; %d tests failed.\n", fail);
-      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
     }
 }
