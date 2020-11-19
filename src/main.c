@@ -25,15 +25,12 @@ int main(int argc, char **argv)
       exit(EXIT_FAILURE);
     }
 
-  /* Generate subkeys */
+  /* Generate subkeys. */
   K = keygen(opt);
 
   /* Set I/O streams */
-  if (NULL == opt.infile)
-    {
-      in = stdin;
-    }
-  else
+  in = stdin;
+  if (NULL != opt.infile)
     {
       in = fopen(opt.infile,"r");
       if (NULL == in)
@@ -43,11 +40,8 @@ int main(int argc, char **argv)
 	}
     }
 
-  if (NULL == opt.outfile)
-    {
-      out = stdout;
-    }
-  else
+  out = stdout;
+  if (NULL != opt.outfile)
     {
       out = fopen(opt.outfile,"w");
       if (NULL == out)
