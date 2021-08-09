@@ -31,17 +31,17 @@ int test_options()
     }
 
   o1 = parse_options(3, infile);
-  if (strncmp("foo", o1.infile, 3))
+  if (strncmp(infile[2], o1.infile, 3))
     {
       ++fail;
-      fprintf(stderr, "FAIL: Read infile 'foo' as '%s'.\n", o1.infile);
+      fprintf(stderr, "FAIL: Read infile '%s' as '%s'.\n", infile[2], o1.infile);
     }
 
   o1 = parse_options(2, outfile);
-  if (strncmp("bar", o1.outfile, 3))
+  if (strncmp(outfile[2], o1.outfile, 3))
     {
       ++fail;
-      fprintf(stderr, "FAIL: Read outfile 'bar' as '%s'.\n", o1.outfile);
+      fprintf(stderr, "FAIL: Read outfile '%s' as '%s'.\n", outfile[2], o1.outfile);
     }
 
   return fail;
