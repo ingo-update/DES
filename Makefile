@@ -72,8 +72,8 @@ test: $(TARGET) $(TESTFILE)
 $(addprefix $(BUILDDIR)/,$(TARGET)): $(OBJFILES)
 
 ## The first dependency for object files must be their source file
-$(OBJDIR)/feistel.o: $(SRC)/feistel.c $(SRC)/types.h $(SRC)/tables.h
-$(OBJDIR)/keygen.o: $(SRC)/keygen.c $(SRC)/types.h $(SRC)/tables.h
+$(OBJDIR)/feistel.o: $(SRC)/feistel.c $(SRC)/key.h $(SRC)/types.h $(SRC)/tables.h
+$(OBJDIR)/keygen.o: $(SRC)/keygen.c $(SRC)/keygen.h $(SRC)/key.h $(SRC)/types.h $(SRC)/tables.h
 $(OBJDIR)/main.o: $(SRC)/main.c $(SRC)/types.h $(SRC)/options.h $(SRC)/feistel.h $(SRC)/tables.h
 $(OBJDIR)/options.o: $(SRC)/options.c $(SRC)/types.h
 
@@ -98,8 +98,8 @@ $(GENSRC)/e.c: $(SRC)/data/e.data $(TABLEGEN)
 $(GENSRC)/p.c: $(SRC)/data/p.data $(TABLEGEN)
 $(GENSRC)/sboxes.c: $(SRC)/data/sboxes.data $(SBOXGEN)
 
-$(TESTDIR)/test-options.o: $(TOPDIR)/test/test-options.c $(SRC)/options.c $(SRC)/options.h $(SRC)/types.h
-$(TESTDIR)/test-keygen.o: $(TOPDIR)/test/test-keygen.c $(SRC)/options.h $(SRC)/types.h $(SRC)/data/pc1.data $(SRC)/data/pc2.data
+$(TESTDIR)/test-options.o: $(TOPDIR)/test/test-options.c $(SRC)/options.c $(SRC)/options.h $(SRC)/key.h $(SRC)/types.h
+$(TESTDIR)/test-keygen.o: $(TOPDIR)/test/test-keygen.c $(SRC)/options.h $(SRC)/key.h $(SRC)/types.h $(SRC)/data/pc1.data $(SRC)/data/pc2.data
 $(TESTDIR)/test-types.o: $(TOPDIR)/test/test-types.c $(SRC)/types.h
 
 $(TESTDIR)/test-options: $(TESTDIR)/test-options.o $(OBJDIR)/options.o

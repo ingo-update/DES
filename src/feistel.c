@@ -1,4 +1,5 @@
 #include "feistel.h"
+#include "key.h"
 #include "tables.h"
 #include "sboxes.h"
 
@@ -10,7 +11,7 @@ WORD64 feistel(WORD64 inbuf, WORD48 *K)
   right = inbuf & 0xffffffff;
   left = (inbuf >> 32) & 0xffffffff;
 
-  for (i = 0 ; i < 16 ; ++i)
+  for (i = 0 ; i < N_SUBKEYS ; ++i)
     {
       temp = right;
       right = (left ^ F(K[i], right));

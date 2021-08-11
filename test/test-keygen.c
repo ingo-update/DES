@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "options.h"
+#include "key.h"
 #include "keygen.h"
 
 int test_keygen()
@@ -18,12 +19,12 @@ int test_keygen()
   opt.decrypt = 1;
   k1 = keygen(opt);
 
-  for (i = 0 ; i < 15 ; ++i)
+  for (i = 0 ; i < N_SUBKEYS - 1 ; ++i)
     {
-      if (k0[i] != k1[15-i])
+      if (k0[i] != k1[N_SUBKEYS - i - 1])
 	{
 	  ++ fail;
-	  fprintf(stderr, "FAIL: Encrypt key %d differs from Decrypt key %d.\n", i, 15 - i);
+	  fprintf(stderr, "FAIL: Encrypt key %d differs from Decrypt key %d.\n", i, N_SUBKEYS - i - 1);
 	}
     }
 
