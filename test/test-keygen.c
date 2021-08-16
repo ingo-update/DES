@@ -24,7 +24,7 @@ int test_keygen()
       if (k0[i] != k1[N_SUBKEYS - i - 1])
 	{
 	  ++ fail;
-	  fprintf(stderr, "FAIL: Encrypt key %d differs from Decrypt key %d.\n", i, N_SUBKEYS - i - 1);
+	  fprintf(stderr, "FAIL: Encrypt key %2d [0x%012llx] differs from Decrypt key %2d [0x%012llx].\n", i, k0[i], N_SUBKEYS - i - 1, k1[N_SUBKEYS - i - 1]);
 	}
     }
 
