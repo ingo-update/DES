@@ -118,7 +118,7 @@ int main()
 {
   int fail;
 
-  fprintf(stdout, "test_options: ");
+  fprintf(stdout, "test-options: ");
   fail = 0;
 
   fail += test_options();

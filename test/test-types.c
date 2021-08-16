@@ -40,7 +40,7 @@ int main()
 {
   int fail;
 
-  fprintf(stdout, "test_types: ");
+  fprintf(stdout, "test-types: ");
   fail = 0;
 
   fail += test_type_sizes();

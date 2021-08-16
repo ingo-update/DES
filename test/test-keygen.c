@@ -35,7 +35,7 @@ int main()
 {
   int fail;
 
-  fprintf(stdout, "test_keygen: ");
+  fprintf(stdout, "test-keygen: ");
   fail = 0;
 
   fail += test_keygen();
