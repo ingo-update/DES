@@ -1,6 +1,8 @@
-# Makefile for DES
+### Makefile for DES ###
 
+PROJECT = DES
 TARGET = DES
+
 ifndef MAKEDIR
   MAKEDIR = ../make
 endif
