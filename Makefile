@@ -3,15 +3,13 @@
 PROJECT = DES
 TARGET = DES
 
+EXTRA_OBJS = $(patsubst $(SRC)/data/%.data,$(OBJDIR)/%.o,$(wildcard $(SRC)/data/*.data))
+
 ifndef MAKEDIR
   MAKEDIR = ../make
 endif
 
-SPEC = $(MAKEDIR)/spec.gmk
-EXTRA_OBJS = $(patsubst $(SRC)/data/%.data,$(OBJDIR)/%.o,$(wildcard $(SRC)/data/*.data))
-
-include $(MAKEDIR)/build.gmk
-include $(MAKEDIR)/test.gmk
+include $(MAKEDIR)/main.gmk
 
 ## Code generator tools
 TABLEGEN = $(TOOLSDIR)/tablegen
@@ -59,6 +57,8 @@ TESTFILE = $(BUILDDIR)/test/testfile
 $(TESTFILE): $(SRCFILES)
 	@$(MKDIR) $(dir $@)
 	@$(CAT) $^ > $@
+
+test-image: $(TESTFILE)
 
 test: $(TARGET) $(TESTFILE)
 	@$(CP) $(TESTFILE) $(TESTFILE).orig
