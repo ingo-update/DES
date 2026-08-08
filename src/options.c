@@ -24,11 +24,11 @@ static WORD64 _readkey(char *keystring, int *valid)
       else if ('a' <= k && 'f' >= k) key += k - 'a' + 10;
       else if ('A' <= k && 'F' >= k) key += k - 'A' + 10;
       else
-	{
-	  fprintf(stderr, "Illegal key character '%c'\n", k);
-	  *valid = 0;
-	  return 0;
-	}
+        {
+          fprintf(stderr, "Illegal key character '%c'\n", k);
+          *valid = 0;
+          return 0;
+        }
     }
 
   *valid = 1;
@@ -45,36 +45,42 @@ struct options parse_options(int argc, char **argv)
   opt.decrypt = 0;
   opt.valid = 0;
   for (i = 1 ; i < argc ; ++i)
-    if ('-' != argv[i][0])
-      if (16 == strlen(argv[i]))
-	{
-	  opt.key = _readkey(argv[i], &opt.valid);
-	  if (opt.valid == 0) _print_usage(argv[0]);
-	}
+    {
+      if ('-' != argv[i][0])
+        {
+          if (16 == strlen(argv[i]))
+            {
+              opt.key = _readkey(argv[i], &opt.valid);
+              if (opt.valid == 0) _print_usage(argv[0]);
+            }
+          else
+            {
+              fprintf(stderr, "Bad key length %d\n", (int) strlen(argv[i]));
+              _print_usage(argv[0]);
+              opt.valid = 0;
+              return opt;
+            }
+        }
       else
-	{
-	  fprintf(stderr, "Bad key length %d\n", (int) strlen(argv[i]));
-	  _print_usage(argv[0]);
-	  opt.valid = 0;
-	  return opt;
-	}
-    else
-      switch(argv[i][1])
-	{
-	case 'd':
-	  opt.decrypt = 1;
-	  break;
-	case 'i':
-	  opt.infile = argv[++i];
-	  break;
-	case 'o':
-	  opt.outfile = argv[++i];
-	  break;
-	default:
-	  fprintf(stderr, "Illegal option %s\n", argv[i]);
-	  _print_usage(argv[0]);
-	  opt.valid = 0;
-	  return opt;
-	}
+        {
+          switch(argv[i][1])
+            {
+            case 'd':
+              opt.decrypt = 1;
+              break;
+            case 'i':
+              opt.infile = argv[++i];
+              break;
+            case 'o':
+              opt.outfile = argv[++i];
+              break;
+            default:
+              fprintf(stderr, "Illegal option %s\n", argv[i]);
+              _print_usage(argv[0]);
+              opt.valid = 0;
+              return opt;
+            }
+        }
+    }
   return opt;
 }

@@ -35,31 +35,31 @@ int main()
     {
       /* read the S-Box data. */
       for(i = 0; i < 64 ; ++i)
-	{
-	  scanf("%d", &(table[i]));
-	}
+        {
+          scanf("%d", &(table[i]));
+        }
 
       /* Print the S-Box as an array that can be used as a lookup table. */
       printf("WORD4 s%d[64] = {\n  ", s+1);
       for (i = 0 ; i < 8 ; ++i)
-	{
-	  printf("%d, %d, ", table[i], table[i+16]);
-	}
+        {
+          printf("%d, %d, ", table[i], table[i+16]);
+        }
       printf("\n  ");
       for (i = 0 ; i < 8 ; ++i)
-	{
-	  printf("%d, %d, ", table[i+8], table[i+24]);
-	}
+        {
+          printf("%d, %d, ", table[i+8], table[i+24]);
+        }
       printf("\n  ");
       for (i = 0 ; i < 8 ; ++i)
-	{
-	  printf("%d, %d, ", table[i+32], table[i+48]);
-	}
+        {
+          printf("%d, %d, ", table[i+32], table[i+48]);
+        }
       printf("\n  ");
       for (i = 0 ; i < 7 ; ++i)
-	{
-	  printf("%d, %d, ", table[i+40], table[i+56]);
-	}
+        {
+          printf("%d, %d, ", table[i+40], table[i+56]);
+        }
 
       /* No comma after the last element in the array. */
       printf("%d, %d\n};\n\n", table[47], table[63]);

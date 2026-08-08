@@ -34,10 +34,10 @@ int main(int argc, char **argv)
     {
       in = fopen(opt.infile,"r");
       if (NULL == in)
-	{
-	  fprintf(stderr, "Could not open file '%s' for input.\n", opt.infile);
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr, "Could not open file '%s' for input.\n", opt.infile);
+          exit(EXIT_FAILURE);
+        }
     }
 
   out = stdout;
@@ -45,10 +45,10 @@ int main(int argc, char **argv)
     {
       out = fopen(opt.outfile,"w");
       if (NULL == out)
-	{
-	  fprintf(stderr, "Could not open file '%s' for output.\n", opt.outfile);
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr, "Could not open file '%s' for output.\n", opt.outfile);
+          exit(EXIT_FAILURE);
+        }
     }
 
   /* Main loop */
@@ -58,10 +58,10 @@ int main(int argc, char **argv)
       bytes = fread(&inbuf, 1, 8, in);
 
       if (0 != bytes)
-	{
-	  outbuf = pi(feistel(ip(inbuf), K));
-	  fwrite(&outbuf, 1, 8, out);
-	}
+        {
+          outbuf = pi(feistel(ip(inbuf), K));
+          fwrite(&outbuf, 1, 8, out);
+        }
     }
 
   fclose(in);
